@@ -1,30 +1,35 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
+export default function Navbar() {
+  const { rol, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-export default function Navbar (){
-  const {rol, logout} = useContext(AuthContext);
+  const handleLogout = () => {
+    logout();
+    navigate("/"); // llevar al login
+  };
 
-  if(!rol) return null; // no mostrar nada si no hay rol
+  return (
+    <nav className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center">
+      <div className="flex gap-4">
+        <Link to="/expedientes" className="hover:underline">Expedientes</Link>
 
-  return(
-    <nav className="bg-gray-900 text-white px-6 py-4 flex gap-6">
-      <Link to="/expedientes">Expedientes</Link>
-      <Link to="/expedientes/nuevo">Nuevo Expediente</Link>
-      <Link to="/reporte">Reporte</Link>
-
-      <div className="ml-auto flex gap-4 items-center">
-        <span>
-          Rol: <strong>{rol}</strong> 
-        </span>
-        <button
-        onClick={logout}
-        className="px-3 py-1 bg-red-500 rounded text-while hover:bg-red-600"
-        >
-          Salir
-        </button>
+        {rol === "coordinador" && (
+          <>
+          <Link to="/reportes" className="hover:underline">Reportes</Link>
+          <Link to="/expedientes/nuevo" className="hover:underline">Nuevo Expediente</Link>
+          </>
+        )}
       </div>
+
+      <button
+        onClick={handleLogout}
+        className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-md text-sm"
+      >
+        Salir
+      </button>
     </nav>
   );
 }
