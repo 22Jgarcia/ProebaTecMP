@@ -5,6 +5,7 @@ const cors = require('cors');
 const expedientesRoutes = require("./routes/expedientes.routes");
 const indiciosRoutes = require("./routes/indicios.routes");
 const usuariosRoutes = require("./routes/usuarios.routes");
+const reportesRoutes = require("./routes/reportes.routes");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use("/expedientes", expedientesRoutes);
 app.use("/indicios", indiciosRoutes);
 app.use("/usuarios", usuariosRoutes );
+app.use("/reportes", reportesRoutes);
 
 const PORT = 3000;
 app.listen(PORT, ()=>{
