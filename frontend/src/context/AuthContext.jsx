@@ -1,26 +1,24 @@
 import { createContext, useState } from "react";
 
-export const AuthContext = createContext();
+// eslint-disable-next-line react-refresh/only-export-components
+export const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children}) => {
-  const [rol, setRol]= useState(localStorage.getItem("rol")|| null);
-  
-  const login = (userRol) =>{
-    setRol (userRol);
+export function AuthProvider({ children }) {
+  const [rol, setRol] = useState(localStorage.getItem("rol") || null);
+
+  const login = (userRol) => {
+    setRol(userRol);
     localStorage.setItem("rol", userRol);
   };
 
-  const logout = () =>{
+  const logout = () => {
     setRol(null);
     localStorage.removeItem("rol");
   };
-  return(
-    <div>
-      <AuthContext.Provider value={{rol, login, logout}}>
-        {children}
-      </AuthContext.Provider>
-    </div>
 
+  return (
+    <AuthContext.Provider value={{ rol, login, logout }}>
+      {children}
+    </AuthContext.Provider>
   );
-
 }
