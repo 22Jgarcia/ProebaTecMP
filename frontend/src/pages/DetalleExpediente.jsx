@@ -84,80 +84,121 @@ export default function DetalleExpediente() {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h2 className="text-3xl font-bold mb-4">Expediente {expediente.numero}</h2>
+<div className="p-6 max-w-4xl mx-auto">
 
-      <p className="mb-3">
-        <span className="font-semibold">Descripción: </span>
-        {expediente.descripcion}
-      </p>
+      {/* CARD PRINCIPAL */}
+      <div className="bg-white shadow-md rounded-xl p-6 border border-gray-200 hover:shadow-lg transition">
+        <h2 className="text-3xl font-bold mb-4 text-gray-800">
+          Expediente {expediente.numero}
+        </h2>
 
-      <p className="mb-3">
-        <span className="font-semibold">Estado: </span>
-        <span className="uppercase">{expediente.estado}</span>
-      </p>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <span className="font-semibold">Descripción: </span>
+            {expediente.descripcion}
+          </p>
 
-      <p>
-        <span className="font-semibold">Fecha: </span>
-        {expediente.fecha_registro}
-      </p>
+          <p>
+            <span className="font-semibold">Estado: </span>
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                expediente.estado === "pendiente"
+                  ? "bg-yellow-100 text-yellow-700"
+                  : expediente.estado === "aprobado"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+              }`}
+            >
+              {expediente.estado.toUpperCase()}
+            </span>
+          </p>
 
-      {rol === "coordinador" && (
-        <div className="mt-6 flex gap-4">
-          <button
-            onClick={aprobar}
-            className="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-          >
-            Aprobar
-          </button>
-
-          <button
-            onClick={rechazar}
-            className="px-5 py-2 bg-red-500 text-white rounded hover:bg-red-700"
-          >
-            Rechazar
-          </button>
+          <p>
+            <span className="font-semibold">Fecha: </span>
+            {expediente.fecha_registro}
+          </p>
         </div>
-      )}
 
-      <h3 className="text-2xl font-semibold mt-10 mb-4">Indicios</h3>
+        {/* BOTONES COORDINADOR */}
+        {rol === "coordinador" && (
+          <div className="mt-6 flex gap-4">
+            <button
+              onClick={aprobar}
+              className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 hover:-translate-y-1 transition"
+            >
+              Aprobar
+            </button>
 
-      <ul className="space-y-3">
-        {indicios.length === 0 && <p>No hay indicios registrados.</p>}
+            <button
+              onClick={rechazar}
+              className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 hover:-translate-y-1 transition"
+            >
+              Rechazar
+            </button>
+          </div>
+        )}
+      </div>
 
-        {indicios.map((i) => (
-          <li key={i.id} className="p-3 border rounded">
-            <strong>Descripción: </strong>{i.descripcion} <br />
-            <strong>Cantidad: </strong>{i.cantidad}
-          </li>
-        ))}
-      </ul>
+      {/* LISTA DE INDICIOS */}
+      <div className="mt-10">
+        <h3 className="text-2xl font-semibold mb-4 text-gray-800">
+          Indicios Registrados
+        </h3>
 
+        {indicios.length === 0 && (
+          <p className="text-gray-600">No hay indicios registrados.</p>
+        )}
+
+        <div className="space-y-4">
+          {indicios.map((i) => (
+            <div
+              key={i.id}
+              className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-1 transition"
+            >
+              <p>
+                <strong>Descripción: </strong> {i.descripcion}
+              </p>
+              <p>
+                <strong>Cantidad: </strong> {i.cantidad}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* FORMULARIO TÉCNICO */}
       {rol === "tecnico" && (
-        <form className="mt-10 p-4 border rounded" onSubmit={agregarIndicios}>
-          <h4 className="text-xl font-bold mb-4">Agregar Indicio</h4>
+        <form
+          className="mt-10 p-5 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition"
+          onSubmit={agregarIndicios}
+        >
+          <h4 className="text-xl font-bold mb-4 text-gray-800">
+            Agregar nuevo indicio
+          </h4>
 
-          <input
-            type="text"
-            placeholder="Descripción del indicio"
-            className="w-full p-2 border rounded mb-3"
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
-            required
-          />
+          <div className="space-y-3">
+            <input
+              type="text"
+              placeholder="Descripción del indicio"
+              className="w-full p-2 border rounded-md"
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+              required
+            />
 
-          <input
-            type="number"
-            min="1"
-            className="w-full p-2 border rounded mb-3"
-            value={cantidad}
-            onChange={(e) => setCantidad(e.target.value)}
-            required
-          />
+            <input
+              type="number"
+              min="1"
+              className="w-full p-2 border rounded-md"
+              value={cantidad}
+              onChange={(e) => setCantidad(e.target.value)}
+              required
+            />
 
-          <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-            Agregar
-          </button>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover:-translate-y-1 transition">
+              Agregar
+            </button>
+          </div>
         </form>
       )}
     </div>
