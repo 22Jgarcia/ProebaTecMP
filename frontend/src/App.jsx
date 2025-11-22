@@ -18,7 +18,7 @@ export default function App() {
           <Route path="/expedientes" element={<Expedientes />} />
           <Route path="/expedientes/nuevo" element={<CrearExpediente />} />
           <Route path="/expedientes/:id" element={<DetalleExpediente />} />
-          <Route path="/reporte" element={<Reporte />} />
+          <Route path="/reportes" element={<Reporte />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
