@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import { Link } from "react-router-dom";
 
 export default function Expedientes(){
   const [expedientes, setExpedientes]= useState([]);
