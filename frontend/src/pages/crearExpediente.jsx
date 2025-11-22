@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 export default function CrearExpediente(){
+  const {rol} = useContext(AuthContext);
   const [numero, setNumero]  = useState("");
   const [descripcion, setDescripcion] = useState("");
   const navigate = useNavigate();
@@ -9,11 +12,11 @@ export default function CrearExpediente(){
   const handleSubmit = async(e)=>{
     e.preventDefault();
     //arreglar para enviar
-    await fetch("http://localhost:3000/expedientes", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ numero, descripcion })
-  });
+      await fetch("http://localhost:3000/expedientes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "rol": rol },
+      body: JSON.stringify({ numero, descripcion })
+    });
     navigate("/expedientes");
   };
 

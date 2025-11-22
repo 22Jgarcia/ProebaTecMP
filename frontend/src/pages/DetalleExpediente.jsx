@@ -1,140 +1,157 @@
-import {  useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
-
-export default function DetalleExpediente(){
-  const {id} =useParams();
-  const navigate= useNavigate();
-  const {rol} = useContext(AuthContext);
+export default function DetalleExpediente() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { rol } = useContext(AuthContext);
 
   const [expediente, setExpediente] = useState(null);
   const [indicios, setIndicios] = useState([]);
 
-  //Campos para el formulario de indicios
   const [descripcion, setDescripcion] = useState("");
   const [cantidad, setCantidad] = useState(1);
 
-  //cargar EXpedientes + indice
-  useEffect(()=>{
-    const CargarDatos = async ()=>{
-      const respExp= await fetch(`http://localhost:3000/expedientes/${id}`);
+  const cargarDatos = async () => {
+    const respExp = await fetch(`http://localhost:3000/expedientes/${id}`);
+    const dataExp = await respExp.json();
+    setExpediente(dataExp);
+
+    const resInd = await fetch(`http://localhost:3000/expedientes/${id}/indicios`);
+    const dataInd = await resInd.json();
+    setIndicios(dataInd);
+  };
+
+  useEffect(() => {
+     const obtenerDatos = async () => {
+      const respExp = await fetch(`http://localhost:3000/expedientes/${id}`);
       const dataExp = await respExp.json();
       setExpediente(dataExp);
 
       const resInd = await fetch(`http://localhost:3000/expedientes/${id}/indicios`);
-      const dataInd= await resInd.json();
+      const dataInd = await resInd.json();
       setIndicios(dataInd);
     };
-    CargarDatos();
-  },[id]);
 
-  if(!expediente) return <p className="p-4"> Cargando Expedientes</p>
+    obtenerDatos();
+  }, [id]);
 
-  //Resgistrar indicios
-  const agregarIndicios = async (e) =>{
+  if (!expediente) return <p className="p-4">Cargando expediente...</p>;
+
+  const agregarIndicios = async (e) => {
     e.preventDefault();
 
-    const nuevo ={
+    const nuevo = {
       expediente_id: Number(id),
       descripcion,
       cantidad: Number(cantidad),
     };
 
-    await fetch(`http://localhost:3000/indicios`,{
-      method:"POST",
-      headers:{"Content-Type": "application/json"},
+    await fetch(`http://localhost:3000/indicios`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(nuevo),
     });
 
-    // Recarga lista
-    const resInd = await fetch(`http://localhost:3000/expedientes/${id}/indicios`);
-    const dataInd= await resInd.json();
-    setIndicios(dataInd);
-
-    //Limpiar formulario
+    await cargarDatos();
     setDescripcion("");
     setCantidad(1);
-
   };
-  //aprobar expediente
-  const aprobar = async()=>{
-    await fetch(`http://localhost:3000/expedientes/${id}/aprobar`,{
+
+  const aprobar = async () => {
+    await fetch(`http://localhost:3000/expedientes/${id}/aprobar`, {
       method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        rol: rol
+      }
     });
-    navigate("/expedientes");
-  }
 
-  const rechazar = async()=>{
+    navigate("/expedientes");
+  };
+
+  const rechazar = async () => {
     await fetch(`http://localhost:3000/expedientes/${id}/rechazar`, {
-      method:"PUT",
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        rol: rol
+      }
     });
-    navigate("/expedientes");
-  }
 
-  return(
+    navigate("/expedientes");
+  };
+
+  return (
     <div className="p-6 max-w-3xl mx-auto">
       <h2 className="text-3xl font-bold mb-4">Expediente {expediente.numero}</h2>
+
       <p className="mb-3">
-        <span className="font-semibold">Descripcion</span>{expediente.descripcion}
+        <span className="font-semibold">Descripción: </span>
+        {expediente.descripcion}
       </p>
+
       <p className="mb-3">
         <span className="font-semibold">Estado: </span>
         <span className="uppercase">{expediente.estado}</span>
+      </p>
 
-      </p>
       <p>
-        <span className="font-semibold">Fecha: </span> {expediente.fecha_registro}
+        <span className="font-semibold">Fecha: </span>
+        {expediente.fecha_registro}
       </p>
-      {/* solo para coordinadores */}
-      {rol=== "coordinador"&& (
+
+      {rol === "coordinador" && (
         <div className="mt-6 flex gap-4">
           <button
-            onChange={aprobar}
+            onClick={aprobar}
             className="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700"
           >
             Aprobar
           </button>
+
           <button
-            onChange={rechazar}
+            onClick={rechazar}
             className="px-5 py-2 bg-red-500 text-white rounded hover:bg-red-700"
           >
             Rechazar
           </button>
         </div>
-      )};
+      )}
 
-      <h3 className="text-2xl font-seminibol mt-10 mb-4">Indicios</h3>
+      <h3 className="text-2xl font-semibold mt-10 mb-4">Indicios</h3>
+
       <ul className="space-y-3">
-        {indicios.length === 0 && <p>No hay indicios registros.</p>}
+        {indicios.length === 0 && <p>No hay indicios registrados.</p>}
 
-        {indicios.map((i)=>(
+        {indicios.map((i) => (
           <li key={i.id} className="p-3 border rounded">
-          <strong>Descripcion</strong>{i.descripcion} <br />
-          <strong>Cantidad</strong>{i.cantidad}
+            <strong>Descripción: </strong>{i.descripcion} <br />
+            <strong>Cantidad: </strong>{i.cantidad}
           </li>
         ))}
-
       </ul>
 
-        {/* solo tecnico puede agregar indicios */}
-      {rol === "tecnico" &&(
+      {rol === "tecnico" && (
         <form className="mt-10 p-4 border rounded" onSubmit={agregarIndicios}>
-          <h4 className="tex-xl font-bold mb-4">Agregar indicios</h4>
-          <input 
-          type="text"
-          placeholder="Descripcion del indicio"
-          className="w-full p-2 border rounded mb-3"
-          value={descripcion}
-          onChange={(e)=> setDescripcion(e.target.value)}
-          required
+          <h4 className="text-xl font-bold mb-4">Agregar Indicio</h4>
+
+          <input
+            type="text"
+            placeholder="Descripción del indicio"
+            className="w-full p-2 border rounded mb-3"
+            value={descripcion}
+            onChange={(e) => setDescripcion(e.target.value)}
+            required
           />
+
           <input
             type="number"
             min="1"
             className="w-full p-2 border rounded mb-3"
             value={cantidad}
-            onChange={(e)=> setCantidad(e.target.value)}
+            onChange={(e) => setCantidad(e.target.value)}
             required
           />
 
@@ -142,7 +159,7 @@ export default function DetalleExpediente(){
             Agregar
           </button>
         </form>
-      )}  
+      )}
     </div>
   );
 }
