@@ -48,12 +48,10 @@ module.exports = {
 
   // APROBAR
   aprobarExpediente: async (req, res) => {
-    const { id } = req.params;
-
     try {
       const pool = await getConnection();
       await pool.request()
-        .input("id", sql.Int, id)
+        .input("id", sql.Int,req.params.id)
         .execute("SP_AprobarExpediente");
 
       res.json({ message: "Expediente aprobado correctamente" });
@@ -65,12 +63,10 @@ module.exports = {
 
   // RECHAZAR
   rechazarExpediente: async (req, res) => {
-    const { id } = req.params;
-
     try {
       const pool = await getConnection();
       await pool.request()
-        .input("id", sql.Int, id)
+        .input("id", sql.Int,req.params.id)
         .execute("SP_RechazarExpediente");
 
       res.json({ message: "Expediente rechazado correctamente" });
@@ -80,7 +76,7 @@ module.exports = {
     }
   },
 
-  // LISTAR INDICIOS DEL EXPEDIENTE
+  
   listarIndiciosPorExpediente: async (req, res) => {
     const { id } = req.params;
 
