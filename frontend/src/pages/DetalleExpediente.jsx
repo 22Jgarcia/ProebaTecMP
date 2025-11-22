@@ -19,7 +19,7 @@ export default function DetalleExpediente(){
   useEffect(()=>{
     const CargarDatos = async ()=>{
       const respExp= await fetch(`http://localhost:3000/expedientes/${id}`);
-      const dataExp= await respExp.json();
+      const dataExp = await respExp.json();
       setExpediente(dataExp);
 
       const resInd = await fetch(`http://localhost:3000/expedientes/${id}/indicios`);
