@@ -1,67 +1,96 @@
-const {getConnection, sql} = require("../config/db");
+const { getConnection, sql } = require("../config/db");
 
 module.exports = {
-  listarExpedientes: async(req, res)=>{
-    try{
+  // LISTAR TODOS
+  listarExpedientes: async (req, res) => {
+    try {
       const pool = await getConnection();
-      const result = await pool.request().execute("sp_ListarExpedientes");
+      const result = await pool.request().execute("SP_ListarExpedientes");
       res.json(result.recordset);
-    }catch(error){
-      res.status(500).json({error: error.message});
-
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   },
 
-  crearExpediente: async(req, res)=>{
-    const {numero, descripcion}= req.body;
-    try{
-      const pool= await getConnection();
-      const result = await pool
-      .request()
-      .input("numero", sql.VarChar, numero)
-      .input("descripcion", sql.VarChar, descripcion)
-      .execute("SP_RegistrarExpediente");
-      res.json({id: result.recordset[0].id});      
-    }catch(error){
-      res.status(500).json({error: error.message});
-    }
-  },
-  obtenerExpediente: async(req,res)=>{
-    try{ 
-    const pool = await getConnection();
-    const result = await pool
-      .request()
-      .input("id", sql.Int, req.params.id)
-      .execute("sp_ObtenerExpediente");
-    res.json(result.recordset[0]);
-    }catch(error){
-      res.status(500).json({error: error.message});
-    }
-  },
-  aprobarExpediente: async(req, res)=>{
-    try{
+  // CREAR
+   crearExpediente: async (req, res) => {
+    const { numero, descripcion } = req.body;
+    const usuario_creacion = req.headers["usuario"];
+
+    try {
       const pool = await getConnection();
-      await pool
-      .request()
-      .input("id", sql.Int, req.params.id)
-      .execute("SP_AprobarExpediente");
-      res.json({mensaje:"Expediente aprobado correctamente"});
-    }catch(error){
-      res.status(500).json({error: error.message});
+
+      const result = await pool.request()
+        .input("numero", sql.VarChar, numero)
+        .input("descripcion", sql.VarChar, descripcion)
+        .input("usuario_creacion", sql.VarChar, usuario_creacion)
+        .execute("SP_RegistrarExpediente");
+
+      res.json({ id: result.recordset[0].id });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   },
-  rechazoExpediente: async(req, res)=>{
-    try{
-      const pool = await getConnection();
-      await pool
-      .request()
-      .input("id",sql.Int, req.params.id )
-      .execute("SP_RechazarEpediente");
-      res.json({mensaje: "Expediente rechazado correctamente"});
 
-    }catch(error){
-      res.status(500).json({error: error.message});
+  // OBTENER POR ID
+obtenerExpediente: async (req, res) => {
+    try {
+      const pool = await getConnection();
+      const result = await pool.request()
+        .input("id", sql.Int, req.params.id)
+        .execute("SP_ObtenerExpediente");
+
+      res.json(result.recordset[0] || null);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  // APROBAR
+  aprobarExpediente: async (req, res) => {
+    try {
+      const pool = await getConnection();
+
+      await pool.request()
+        .input("id", sql.Int, req.params.id)
+        .input("usuario_aprobacion", sql.VarChar, req.headers["usuario"])
+        .execute("SP_AprobarExpediente");
+
+      res.json({ message: "Expediente aprobado correctamente" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  // RECHAZAR
+  rechazarExpediente: async (req, res) => {
+    const { justificacion } = req.body;
+
+    try {
+      const pool = await getConnection();
+
+      await pool.request()
+        .input("id", sql.Int, req.params.id)
+        .input("justificacion_rechazo", sql.VarChar, justificacion)
+        .input("usuario_rechazo", sql.VarChar, req.headers["usuario"])
+        .execute("SP_RechazarExpediente");
+
+      res.json({ message: "Expediente rechazado correctamente" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  listarIndiciosPorExpediente: async (req, res) => {
+    try {
+      const pool = await getConnection();
+      const result = await pool.request()
+        .input("expediente_id", sql.Int, req.params.id)
+        .query(`SELECT * FROM Indicios WHERE expediente_id = @expediente_id`);
+
+      res.json(result.recordset);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   }
-
-}
+};
