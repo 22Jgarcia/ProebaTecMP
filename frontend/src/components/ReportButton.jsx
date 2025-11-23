@@ -10,9 +10,7 @@ export default function ReportButtons({ datos = [], nombre = "Reporte" }) {
   // Detectar columnas automáticamente
   const columnas = datos.length > 0 ? Object.keys(datos[0]) : [];
 
-  // -------------------------------
   //   GENERAR PDF
-  // -------------------------------
   const exportarPDF = () => {
     const doc = new jsPDF("landscape");
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -80,9 +78,7 @@ export default function ReportButtons({ datos = [], nombre = "Reporte" }) {
     doc.save(`${nombre}.pdf`);
   };
 
-  // -------------------------------
   //   GENERAR EXCEL
-  // -------------------------------
   const exportarExcel = () => {
     const hoja = XLSX.utils.json_to_sheet(datos);
     const libro = XLSX.utils.book_new();
@@ -90,9 +86,7 @@ export default function ReportButtons({ datos = [], nombre = "Reporte" }) {
     XLSX.writeFile(libro, `${nombre}.xlsx`);
   };
 
-  // -------------------------------
   //   GENERAR CSV
-  // -------------------------------
   const exportarCSV = () => {
     const csvRows = [];
     csvRows.push(columnas.join(","));
@@ -111,9 +105,7 @@ export default function ReportButtons({ datos = [], nombre = "Reporte" }) {
     a.click();
   };
 
-  // -------------------------------
   //   COPIAR AL PORTAPAPELES
-  // -------------------------------
   const copiar = () => {
     let texto = columnas.join("\t") + "\n";
 
