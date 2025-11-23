@@ -1,7 +1,6 @@
 const { getConnection, sql } = require("../config/db");
 
 module.exports = {
-  
   // LISTAR TODOS
   listarExpedientes: async (req, res) => {
     try {
@@ -19,13 +18,13 @@ module.exports = {
 
     try {
       const pool = await getConnection();
-      const result = await pool.request()
+      const result = await pool
+        .request()
         .input("numero", sql.VarChar, numero)
         .input("descripcion", sql.VarChar, descripcion)
         .execute("SP_RegistrarExpediente");
 
       res.json({ id: result.recordset[0].id });
-
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -35,12 +34,12 @@ module.exports = {
   obtenerExpediente: async (req, res) => {
     try {
       const pool = await getConnection();
-      const result = await pool.request()
+      const result = await pool
+        .request()
         .input("id", sql.Int, req.params.id)
         .execute("SP_ObtenerExpediente");
 
       res.json(result.recordset[0] || null);
-
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -50,12 +49,12 @@ module.exports = {
   aprobarExpediente: async (req, res) => {
     try {
       const pool = await getConnection();
-      await pool.request()
-        .input("id", sql.Int,req.params.id)
+      await pool
+        .request()
+        .input("id", sql.Int, req.params.id)
         .execute("SP_AprobarExpediente");
 
       res.json({ message: "Expediente aprobado correctamente" });
-
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -63,35 +62,41 @@ module.exports = {
 
   // RECHAZAR
   rechazarExpediente: async (req, res) => {
+    const { id } = req.params;
+    const { justificacion } = req.body;
+
+    if (!justificacion || justificacion.trim() === "") {
+      return res.status(400).json({ error: "La justificación es obligatoria" });
+    }
+
     try {
       const pool = await getConnection();
-      await pool.request()
-        .input("id", sql.Int,req.params.id)
+      await pool
+        .request()
+        .input("id", sql.Int, id)
+        .input("justificacion", sql.VarChar, justificacion)
         .execute("SP_RechazarExpediente");
 
-      res.json({ message: "Expediente rechazado correctamente" });
-
+      res.json({ message: "Expediente rechazado con justificación" });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   },
 
-  
   listarIndiciosPorExpediente: async (req, res) => {
     const { id } = req.params;
 
     try {
       const pool = await getConnection();
 
-      const result = await pool.request()
+      const result = await pool
+        .request()
         .input("expediente_id", sql.Int, id)
         .query(`SELECT * FROM Indicios WHERE expediente_id = @expediente_id`);
 
       res.json(result.recordset);
-
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   },
-
 };
