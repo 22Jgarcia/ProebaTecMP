@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
-
+import logoMP from "../assets/logo.png";
 export default function Navbar() {
   const { rol, logout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -12,40 +12,60 @@ export default function Navbar() {
   };
   if (!rol) return null;
   return (
-     <nav className="bg-white shadow-md border-b border-gray-200">
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        
-        {/* Logo / Título */}
+    <nav className="bg-[#00394F] text-white shadow-lg px-6 py-3">
+      <div className="max-w-7xl mx-auto h-16 flex items-center justify-between">
+        {/* IZQUIERDA: Logo + Título */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-md"></div>
-          <span className="text-xl font-semibold text-gray-800">
-            Sistema de Expedientes MP
-          </span>
+          <img
+            src={logoMP}
+            alt="MP Logo"
+            className="w-15 h-10 object-contain"
+          />
+          <span className="font-bold text-xl">Sistema MP</span>
         </div>
 
-        {/* Opciones */}
-        <div className="flex items-center gap-6 text-gray-700 font-medium">
-          
+        {/* DERECHA: Menú + Salir */}
+        <div className="flex items-center gap-6">
           <Link
             to="/expedientes"
-            className="hover:text-blue-600 transition"
+            className={({ isActive }) =>
+              `hover:text-gray-300 transition ${
+                isActive ? "underline font-semibold" : ""
+              }`
+            }
           >
             Expedientes
           </Link>
 
           {rol === "coordinador" && (
-            <Link
-              to="/reportes"
-              className="hover:text-blue-600 transition"
-            >
-              Reportes
-            </Link>
+            <>
+              <Link
+                to="/reportes"
+                className={({ isActive }) =>
+                  `hover:text-gray-300 transition ${
+                    isActive ? "underline font-semibold" : ""
+                  }`
+                }
+              >
+                Reportes
+              </Link>
+
+              <Link
+                to="/expedientes/nuevo"
+                className={({ isActive }) =>
+                  `hover:text-gray-300 transition ${
+                    isActive ? "underline font-semibold" : ""
+                  }`
+                }
+              >
+                Nuevo Expediente
+              </Link>
+            </>
           )}
 
           <button
             onClick={handleLogout}
-            className="ml-4 px-4 py-1.5 rounded-md bg-red-600 text-white
-                       hover:bg-red-700 transition shadow-sm"
+            className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md font-semibold transition shadow"
           >
             Salir
           </button>
