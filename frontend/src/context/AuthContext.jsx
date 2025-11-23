@@ -4,20 +4,25 @@ import { createContext, useState } from "react";
 export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [rol, setRol] = useState(localStorage.getItem("rol") || null);
+  
+  const [usuario, setUsuario] = useState(() => {
+    const data = localStorage.getItem("usuario");
+    return data ? JSON.parse(data) : null;
+  });
 
-  const login = (userRol) => {
-    setRol(userRol);
-    localStorage.setItem("rol", userRol);
-  };
+  const login = (nombre, rol) => {
+  const user = { nombre, rol };
+  setUsuario(user);
+  localStorage.setItem("usuario", JSON.stringify(user));
+};
 
   const logout = () => {
-    setRol(null);
-    localStorage.removeItem("rol");
+    setUsuario(null);
+    localStorage.removeItem("usuario");
   };
 
   return (
-    <AuthContext.Provider value={{ rol, login, logout }}>
+    <AuthContext.Provider value={{ usuario, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

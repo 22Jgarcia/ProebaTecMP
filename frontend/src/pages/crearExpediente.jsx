@@ -4,7 +4,7 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 export default function CrearExpediente() {
-  const { rol } = useContext(AuthContext);
+  const { usuario } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [numero, setNumero] = useState("");
@@ -21,7 +21,9 @@ export default function CrearExpediente() {
         setNumero("EXP-001");
         return;
       }
-      const ult = data[data.length - 1].numero;
+      const ordenados = data.sort((a, b) => b.id - a.id);
+
+      const ult = ordenados[0].numero; // el más reciente
       const num = parseInt(ult.split("-")[1]);
       const nuevo = `EXP-${String(num + 1).padStart(3, "0")}`;
       setNumero(nuevo);
@@ -42,13 +44,17 @@ export default function CrearExpediente() {
     }
     setShowModal(true);
   };
-
+  if (!usuario) {
+    navigate("/");
+    return null;
+  }
   const confirmarCreacion = async () => {
     await fetch("http://localhost:3000/expedientes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        rol: rol,
+        usuario: usuario.nombre,
+        rol: usuario.rol,
       },
       body: JSON.stringify({ numero, descripcion }),
     });
@@ -71,8 +77,8 @@ export default function CrearExpediente() {
   //   navigate("/expedientes");
   // };
 
-   return (
-     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-10">
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-10">
       <div className="bg-white shadow-xl rounded-xl p-10 w-full max-w-3xl">
         <h2 className="text-3xl font-bold text-center mb-10 text-gray-800">
           Crear Expediente
@@ -86,7 +92,6 @@ export default function CrearExpediente() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-
           {/* Número */}
           <div>
             <label className="block text-gray-700 font-semibold mb-1">
@@ -133,7 +138,6 @@ export default function CrearExpediente() {
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
           <div className="bg-white p-6 rounded-xl shadow-lg w-96 text-center">
-
             <h3 className="text-xl font-bold mb-4">Confirmar creación</h3>
             <p className="mb-6 text-gray-700">
               ¿Desea crear el expediente <strong>{numero}</strong>?

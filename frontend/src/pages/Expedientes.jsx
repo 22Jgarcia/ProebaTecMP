@@ -69,10 +69,15 @@ export default function Expedientes() {
                 {exp.estado.toUpperCase()}
               </span>
             </div>
-
+                
             {/* Descripción */}
             <p className="text-sm text-slate-700 mb-6 leading-snug line-clamp-3">
               {exp.descripcion}
+            </p>
+
+            <p className="mt-1 text-gray-600 text-sm">
+              Registrado por:{" "}
+              <span className="font-semibold">{exp.usuario_creacion}</span>
             </p>
 
             {/* Fecha */}
